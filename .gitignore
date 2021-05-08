@@ -102,3 +102,8 @@ dist
 
 # TernJS port file
 .tern-port
+data/coco.names
+yolov3-tiny.cfg
+yolov3-tiny.weights
+yolov3.weights
+yolov3.cfg
