@@ -27,11 +27,9 @@ RUN \
  wget https://pjreddie.com/media/files/yolov3.weights && \
  mkdir data && \
  cd data && \
- wget https://raw.githubusercontent.com/pjreddie/darknet/master/data/coco.names
-
-WORKDIR /project/openrov-object-recognition-server
-
-RUN \
+ wget https://raw.githubusercontent.com/pjreddie/darknet/master/data/coco.names && \
+ cd /project/openrov-object-recognition-server && \
  npm install darknet
 
+WORKDIR /project/openrov-object-recognition-server
 ENTRYPOINT ["./start_server.sh"]
