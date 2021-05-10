@@ -1,1 +1,1 @@
-# openrov-object-detection-server
+# openrov-object-recognition-server
