@@ -1,1 +1,3 @@
-node index.js
+#!/bin/bash
+
+node `dirname "$0"`/index.js
