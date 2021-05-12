@@ -3,8 +3,6 @@ const http = require('http');
 var fs = require("fs");
 var tmp = require("tmp");
 
-tmp.setGracefulCleanup();
-
 // Init
 const darknet = new Darknet({
   weights: "./yolov3.weights",
@@ -12,7 +10,7 @@ const darknet = new Darknet({
   namefile: "./data/coco.names",
 })
 
-const hostname = '127.0.0.1';
+const hostname = '0.0.0.0';
 const port = 3000;
 
 const server = http.createServer((req, res) => {
@@ -26,26 +24,32 @@ const server = http.createServer((req, res) => {
 
   req.on("end", () => {
     console.log("Data Arrived");
+    var bd_box = null;
 
-    let tmp_file  = tmp.fileSync({postfix: ".png"});
-    var dataurl = JSON.parse(rc_data).data;
-    var regex = /^data:.+\/(.+);base64,(.*)$/;
-    var matches = dataurl.match(regex);
+    tmp.file({postfix: ".jpg"}, function _tempFileCreated(err, path, fd, cleanupCallback) {
+      if (err) throw err;
 
-    var ext = matches[1];
-    var data = matches[2];
-    var buffer = Buffer.from(data, 'base64');
-    fs.writeFileSync(tmp_file.name, buffer);
+      var dataurl = JSON.parse(rc_data).data;
+      var regex = /^data:.+\/(.+);base64,(.*)$/;
+      var matches = dataurl.match(regex);
 
-    console.log('File: ', tmp_file.name);
-    console.log('Filedescriptor: ', tmp_file.fd);
+      var ext = matches[1];
+      var data = matches[2];
+      var buffer = Buffer.from(data, 'base64');
 
-    let bd_box = darknet.detect(tmp_file.name)[0];
-    console.log(bd_box);
+      fs.writeFile(path, buffer, function(){
+        console.log('File: ', path);
+        console.log('Filedescriptor: ', fd);
 
-    res.statusCode=200;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(bd_box))
+        bd_box = darknet.detect(path)[0];
+        console.log(bd_box);
+
+        res.statusCode=200;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(bd_box))
+      });
+
+    });
   });
   
 });
