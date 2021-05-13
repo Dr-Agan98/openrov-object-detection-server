@@ -1,4 +1,8 @@
 {
+  "name": "openrov-object-recognition-server",
+  "scripts": {
+    "start": "node ./server.js"
+  },
   "dependencies": {
     "darknet": "^3.1.6",
     "tmp": "^0.2.1"
