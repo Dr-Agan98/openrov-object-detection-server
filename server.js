@@ -5,9 +5,9 @@ var tmp = require("tmp");
 
 // Init
 const darknet = new Darknet({
-  weights: "./yolov3.weights",
-  config: "./yolov3.cfg",
-  namefile: "./data/coco.names",
+  weights: "./yolov4-tiny-3l_best_2.weights",
+  config: "./yolov4-tiny-3l.cfg",
+  namefile: "./data/detector.names",
 })
 
 const hostname = '0.0.0.0';
@@ -19,11 +19,11 @@ const server = http.createServer((req, res) => {
 
   req.on("data", chunk => {
     rc_data+=chunk;
-    console.log("Incoming Data...");
+    //console.log("Incoming Data...");
   });
 
   req.on("end", () => {
-    console.log("Data Arrived");
+    //console.log("Data Arrived");
     var bd_box = null;
 
     tmp.file({postfix: ".jpg"}, function _tempFileCreated(err, path, fd, cleanupCallback) {
@@ -38,10 +38,15 @@ const server = http.createServer((req, res) => {
       var buffer = Buffer.from(data, 'base64');
 
       fs.writeFile(path, buffer, function(){
-        console.log('File: ', path);
-        console.log('Filedescriptor: ', fd);
+        //console.log('File: ', path);
+        //console.log('Filedescriptor: ', fd);
 
-        bd_box = darknet.detect(path)[0];
+        bd_box = darknet.detect(path,{thresh:0.2})[0];
+        if(bd_box==null){
+          bd_box = {
+            box: null
+          };
+        }
         console.log(bd_box);
 
         res.statusCode=200;
